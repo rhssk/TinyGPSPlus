@@ -24,11 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __TinyGPSPlus_h
 #define __TinyGPSPlus_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <zephyr.h>
+
 #include <limits.h>
 
 #define _GPS_VERSION "1.0.2" // software version of this library
@@ -56,7 +53,7 @@ struct TinyGPSLocation
 public:
    bool isValid() const    { return valid; }
    bool isUpdated() const  { return updated; }
-   uint32_t age() const    { return valid ? millis() - lastCommitTime : (uint32_t)ULONG_MAX; }
+   uint32_t age() const    { return valid ? k_uptime_get_32() - lastCommitTime : (uint32_t)ULONG_MAX; }
    const RawDegrees &rawLat()     { updated = false; return rawLatData; }
    const RawDegrees &rawLng()     { updated = false; return rawLngData; }
    double lat();
@@ -80,7 +77,7 @@ struct TinyGPSDate
 public:
    bool isValid() const       { return valid; }
    bool isUpdated() const     { return updated; }
-   uint32_t age() const       { return valid ? millis() - lastCommitTime : (uint32_t)ULONG_MAX; }
+   uint32_t age() const       { return valid ? k_uptime_get_32() - lastCommitTime : (uint32_t)ULONG_MAX; }
 
    uint32_t value()           { updated = false; return date; }
    uint16_t year();
@@ -104,7 +101,7 @@ struct TinyGPSTime
 public:
    bool isValid() const       { return valid; }
    bool isUpdated() const     { return updated; }
-   uint32_t age() const       { return valid ? millis() - lastCommitTime : (uint32_t)ULONG_MAX; }
+   uint32_t age() const       { return valid ? k_uptime_get_32() - lastCommitTime : (uint32_t)ULONG_MAX; }
 
    uint32_t value()           { updated = false; return time; }
    uint8_t hour();
@@ -129,7 +126,7 @@ struct TinyGPSDecimal
 public:
    bool isValid() const    { return valid; }
    bool isUpdated() const  { return updated; }
-   uint32_t age() const    { return valid ? millis() - lastCommitTime : (uint32_t)ULONG_MAX; }
+   uint32_t age() const    { return valid ? k_uptime_get_32() - lastCommitTime : (uint32_t)ULONG_MAX; }
    int32_t value()         { updated = false; return val; }
 
    TinyGPSDecimal() : valid(false), updated(false), val(0)
@@ -149,7 +146,7 @@ struct TinyGPSInteger
 public:
    bool isValid() const    { return valid; }
    bool isUpdated() const  { return updated; }
-   uint32_t age() const    { return valid ? millis() - lastCommitTime : (uint32_t)ULONG_MAX; }
+   uint32_t age() const    { return valid ? k_uptime_get_32() - lastCommitTime : (uint32_t)ULONG_MAX; }
    uint32_t value()        { updated = false; return val; }
 
    TinyGPSInteger() : valid(false), updated(false), val(0)
@@ -199,7 +196,7 @@ public:
 
    bool isUpdated() const  { return updated; }
    bool isValid() const    { return valid; }
-   uint32_t age() const    { return valid ? millis() - lastCommitTime : (uint32_t)ULONG_MAX; }
+   uint32_t age() const    { return valid ? k_uptime_get_32() - lastCommitTime : (uint32_t)ULONG_MAX; }
    const char *value()     { updated = false; return buffer; }
 
 private:

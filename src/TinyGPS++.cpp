@@ -21,11 +21,20 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "TinyGPS++.h"
+#include "TinyGPS++.hpp"
 
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <math.h>
+
+#define TWO_PI 6.283185307179586476925286766559
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+#define RAD_TO_DEG 57.295779513082320876798154814105
+
+#define radians(deg) ((deg)*DEG_TO_RAD)
+#define degrees(rad) ((rad)*RAD_TO_DEG)
+#define sq(x) ((x)*(x))
 
 #define _GPRMCterm   "GPRMC"
 #define _GPGGAterm   "GPGGA"
@@ -161,7 +170,7 @@ bool TinyGPSPlus::endOfTermHandler()
   // If it's the checksum term, and the checksum checks out, commit
   if (isChecksumTerm)
   {
-    byte checksum = 16 * fromHex(term[0]) + fromHex(term[1]);
+    uint8_t checksum = 16 * fromHex(term[0]) + fromHex(term[1]);
     if (checksum == parity)
     {
       passedChecksumCount++;
@@ -338,7 +347,7 @@ void TinyGPSLocation::commit()
 {
    rawLatData = rawNewLatData;
    rawLngData = rawNewLngData;
-   lastCommitTime = millis();
+   lastCommitTime = k_uptime_get_32();
    valid = updated = true;
 }
 
@@ -369,14 +378,14 @@ double TinyGPSLocation::lng()
 void TinyGPSDate::commit()
 {
    date = newDate;
-   lastCommitTime = millis();
+   lastCommitTime = k_uptime_get_32();
    valid = updated = true;
 }
 
 void TinyGPSTime::commit()
 {
    time = newTime;
-   lastCommitTime = millis();
+   lastCommitTime = k_uptime_get_32();
    valid = updated = true;
 }
 
@@ -436,7 +445,7 @@ uint8_t TinyGPSTime::centisecond()
 void TinyGPSDecimal::commit()
 {
    val = newval;
-   lastCommitTime = millis();
+   lastCommitTime = k_uptime_get_32();
    valid = updated = true;
 }
 
@@ -448,7 +457,7 @@ void TinyGPSDecimal::set(const char *term)
 void TinyGPSInteger::commit()
 {
    val = newval;
-   lastCommitTime = millis();
+   lastCommitTime = k_uptime_get_32();
    valid = updated = true;
 }
 
@@ -478,7 +487,7 @@ void TinyGPSCustom::begin(TinyGPSPlus &gps, const char *_sentenceName, int _term
 void TinyGPSCustom::commit()
 {
    strcpy(this->buffer, this->stagingBuffer);
-   lastCommitTime = millis();
+   lastCommitTime = k_uptime_get_32();
    valid = updated = true;
 }
 
